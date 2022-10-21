@@ -1,36 +1,27 @@
-// document.addEventListener("DOMContentLoaded", getData);
+document.addEventListener("DOMContentLoaded", getData);
 
-const data = [
-    {
-        id: 1,
-        nome: "Caneta",
-        quantidade: 10,
-        valor: 3.20,
-    },
-    {
-        id: 2,
-        nome: "Lápis",
-        quantidade: 20,
-        valor: 1.20,
-    },
-    {
-        id: 3,
-        nome: "Papel",
-        quantidade: 5,
-        valor: 3,
-    },
-    {
-        id: 4,
-        nome: "Caderno",
-        quantidade: 8,
-        valor: 25,
-    },
-];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyCbHH9Ur85s6Pqz7APTyOP6C9hMhLtuQeg",
+  authDomain: "primeiro-projeto-e0390.firebaseapp.com",
+  databaseURL: "https://primeiro-projeto-e0390-default-rtdb.firebaseio.com",
+  projectId: "primeiro-projeto-e0390",
+  storageBucket: "primeiro-projeto-e0390.appspot.com",
+  messagingSenderId: "723226326735",
+  appId: "1:723226326735:web:7a70433ed43348100969ba"
+}
+
+const app = initializeApp(firebaseConfig);
+const database = getFirestore(app);
 
 // read
-function getData() {
-    populateTable(data);
+async function getData() {
+    const estoque = collection(database, "estoque");
+    const estoqueSnapshot = await getDocs(estoque);
+    const estoqueData = estoqueSnapshot.docs.map(doc => doc.data());
+    populateTable(estoqueData);
 }
 
 function populateTable(stock) {
@@ -72,5 +63,3 @@ function updateItem(id, item) {
 function deleteItem(id) {
 
 }
-
-getData();
