@@ -1,7 +1,12 @@
-document.addEventListener("DOMContentLoaded", getData);
+document.addEventListener("DOMContentLoaded", () => {
+    const createBtn = document.getElementById("create");
+    createBtn.addEventListener("click", (event) => addItem(event));
+
+    getData();
+});
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCbHH9Ur85s6Pqz7APTyOP6C9hMhLtuQeg",
@@ -20,7 +25,7 @@ const database = getFirestore(app);
 async function getData() {
     const estoque = collection(database, "estoque");
     const estoqueSnapshot = await getDocs(estoque);
-    const estoqueData = estoqueSnapshot.docs.map(doc => doc.data());
+    const estoqueData = estoqueSnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     populateTable(estoqueData);
 }
 
@@ -33,7 +38,10 @@ function populateTable(stock) {
                 <td>${item.quantidade}</td>
                 <td>R$ ${item.valor}</td>
                 <td>
-                    <button type="button" class="btn btn-primary">Editar</button>
+                    <button type="button" class="btn btn-primary" 
+                        onclick="fillFields('${item.nome}', ${item.quantidade}, ${item.valor})">
+                        Editar
+                    </button>
                     <button type="button" class="btn btn-danger">Apagar</button>
                 </td>
             </tr>
@@ -43,7 +51,7 @@ function populateTable(stock) {
 }
 
 // create
-function addItem(e) {
+async function addItem(e) {
     e.preventDefault();
 
     const nome = document.querySelector("#nome").value;
@@ -51,11 +59,16 @@ function addItem(e) {
     const valor = document.querySelector("#valor").value;
 
     const item = { nome, quantidade, valor }
-    console.log(item);
+    
+    const estoque = collection(database, "estoque");
+    const doc = await addDoc(estoque, item);
+    if (doc) {
+        getData();
+    }
 }
 
 // update
-function updateItem(id, item) {
+function updateItem(item) {
 
 }
 
