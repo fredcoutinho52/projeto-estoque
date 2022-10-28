@@ -30,6 +30,7 @@ async function getData() {
 }
 
 function populateTable(stock) {
+    cleanTable();
     const tbody = document.querySelector("tbody");
     const items = stock.map(item => {
         return `
@@ -50,6 +51,14 @@ function populateTable(stock) {
     tbody.insertAdjacentHTML("beforeend", items);
 }
 
+function cleanTable() {
+    const tbody = document.querySelector("tbody");
+    const tbodyChildren = tbody.querySelectorAll("tr");
+    tbodyChildren.forEach(item => {
+        tbody.removeChild(item);
+    });
+}
+
 // create
 async function addItem(e) {
     e.preventDefault();
@@ -62,9 +71,7 @@ async function addItem(e) {
     
     const estoque = collection(database, "estoque");
     const doc = await addDoc(estoque, item);
-    if (doc) {
-        getData();
-    }
+    if (doc) getData();
 }
 
 // update
