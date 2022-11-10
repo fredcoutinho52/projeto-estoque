@@ -3,10 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
     createBtn.addEventListener("click", (event) => addItem(event));
 
     getData();
+
+    const deleteBtn = document.getElementById("delete");
+    deleteBtn.addEventListener("click", () => deleteItem());
 });
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
+import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCbHH9Ur85s6Pqz7APTyOP6C9hMhLtuQeg",
@@ -40,10 +43,12 @@ function populateTable(stock) {
                 <td>R$ ${item.valor}</td>
                 <td>
                     <button type="button" class="btn btn-primary" 
-                        onclick="fillFields('${item.nome}', ${item.quantidade}, ${item.valor})">
+                        onclick="fillFields('${item.nome}', ${item.quantidade}, ${item.valor}, '${item.id}')">
                         Editar
                     </button>
-                    <button type="button" class="btn btn-danger">Apagar</button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="setIdOnLocalStorage('${item.id}')">
+                        Apagar
+                    </button>
                 </td>
             </tr>
         `;
@@ -68,6 +73,11 @@ async function addItem(e) {
     const valor = document.querySelector("#valor").value;
 
     const item = { nome, quantidade, valor }
+
+    if (localStorage.getItem("item-estoque-id")) {
+        updateItem(item);
+        return;
+    }
     
     const estoque = collection(database, "estoque");
     const doc = await addDoc(estoque, item);
@@ -75,11 +85,17 @@ async function addItem(e) {
 }
 
 // update
-function updateItem(item) {
-
+async function updateItem(item) {
+    const id = localStorage.getItem("item-estoque-id");
+    await updateDoc(doc(database, "estoque", id), item);
+    localStorage.removeItem("item-estoque-id");
+    getData();
 }
 
 // delete
-function deleteItem(id) {
-
+function deleteItem() {
+    const id = localStorage.getItem("item-estoque-id");
+    deleteDoc(doc(database, "estoque", id));
+    localStorage.removeItem("item-estoque-id");
+    getData();
 }
